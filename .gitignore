@@ -1,3 +1,6 @@
+# "level" database directory
+users_db
+
 # Logs
 logs
 *.log

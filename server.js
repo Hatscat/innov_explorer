@@ -1,18 +1,43 @@
-var Hapi = require('hapi')
+var Hapi = require("hapi")
+var config = require("./config.js")
+var login_handler = require("./game/login.js")
+var set_distance_handler = require("./game/set_distance.js")
+var stop_handler = require("./game/stop.js")
+var upgrade_handler = require("./game/upgrade.js")
+var inputs_handler = require("./game/inputs.js")
+var update_handler = require("./game/update.js")
 
 var server = new Hapi.Server()
-server.connection({ port: 4000, labels: ['api'] })
-server.connection({ port: 4001, labels: ['chat'] })
+var players = {}
 
-var io = require('socket.io')(server.select('chat').listener)
+server.connection({ port: config.ws_game_port, labels: "game" })
+//server.connection({ port: config.rest_api_port, labels: "api" })
 
-io.on('connection', function (socket) {
+var io = require("socket.io")(server.select("game").listener)
 
-    socket.emit('Oh hii!')
+io.on("connection", function (socket) {
 
-    socket.on('burp', function () {
-        socket.emit('Excuse you!')
-    })
+	console.log("connection!")
+	
+	socket.pseudo = null
+
+	socket.on("login", login_handler.bind(null, socket, players))
+	socket.on("set_dist", set_distance_handler.bind(null, socket, players))
+	socket.on("stop", stop_handler.bind(null, socket, players))
+	socket.on("upgrade", upgrade_handler.bind(null, socket, players))
+	socket.on("inputs", inputs_handler.bind(null, socket, players))
+
+	socket.once("disconnect", function () {
+		console.log("player " + socket.pseudo + " left the game")
+		players[socket.pseudo] = null
+	})
 })
 
-server.start()
+// launch update loop
+
+
+server.start(function () {
+	console.log("innov explorer game server runs!")
+})
+
+
