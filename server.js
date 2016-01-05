@@ -27,8 +27,9 @@ io.on("connection", function (socket) {
 
 	socket.once("disconnect", function () {
 		if (socket.pseudo) {
-			console.log("player " + socket.pseudo + " left the game")
+			//console.log("player " + socket.pseudo + " left the game")
 			players[socket.pseudo] = null
+			delete players[socket.pseudo]
 		}
 	})
 })

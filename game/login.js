@@ -27,6 +27,8 @@ function login_handler (socket, players, pseudo) {
 		return
 	}
 
+	players[pseudo] = {} // reserved, warning in run loop
+
 	users_db.get(pseudo, function (err, data) {
 
 		var upgrades_hex = data || config.default_upgrades_value
@@ -43,20 +45,23 @@ function login_handler (socket, players, pseudo) {
 			})
 		}
 
-		players[pseudo] = {
-			upgrades: upgrades,
-			x: 0,
-			y: 0,
-			direction: 0,
-			distance_max: config.distance_min,
-			pulse_timer: 0,
-			can_pulse: true,
-			stop: true // default value ?
+		if (players[pseudo]) { // if not deco while db search
+
+			players[pseudo] = {
+				upgrades: upgrades,
+				x: 0,
+				y: 0,
+				direction: 0,
+				distance_max: config.distance_min,
+				pulse_timer: 0,
+				can_pulse: true,
+				stop: true // default value ?
+			}
+
+			socket.pseudo = pseudo
+
+			socket.emit("upgrades", upgrades)
 		}
-
-		socket.pseudo = pseudo
-
-		socket.emit("upgrades", upgrades)
 	})
 }
 

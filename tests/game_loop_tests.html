@@ -1,78 +1,116 @@
-<body>
+<body style="margin:0;pading:0">
 <canvas id="visible_canvas"></canvas>
 <script src="http://localhost:4000/socket.io/socket.io.js"></script>
 <script>
 
 "use strict"
 
-window.socket = io.connect("http://localhost:4000");
 
-// ------------ emit ------------ //
-
-function t_login (pseudo)
-{
-	socket.emit("login", pseudo);
-}
-
-function t_distance (dist)
-{
-	socket.emit("distance", dist);
-}
-
-function t_stop (is_stop)
-{
-	socket.emit("stop", is_stop);
-}
-
-function t_inputs (direction, is_pulsing)
-{
-	var data = {
-		direction: direction,
-		pulse: is_pulsing
-	};
-
-	socket.emit("inputs", data);
-}
-
-function t_upgrade (upgrade_id, upgrade_choice_id)
-{
-	var data = {
-		upgrade: upgrade_id,
-		choice: upgrade_choice_id
-	};
-
-	socket.emit("upgrade", data);
-}
-
-// ------------ on ------------ //
-
-socket.on("err", function (err)
-{
-	console.error("err:", err);
-});
-
-socket.on("upgrades", function (data)
-{
-	console.log("upgrades:", data);
-});
-
-// ------------ tests ------------ //
 
 onload = function ()
 {
+	window.is_logged = false;
+	window.W = visible_canvas.width = innerWidth;
+	window.H = visible_canvas.height = innerHeight;
+	window.hW = W >> 1;
+	window.hH = H >> 1;
+	window.visible_ctx = visible_canvas.getContext("2d");
+	window.buffer_canvas = visible_canvas.cloneNode();
+	window.buffer_ctx = buffer_canvas.getContext("2d");
+	window.my_player = {
+		x: 0,
+		y: 0,
+		dir: 0,
+		upgrades: null
+	}
 
+	init_ws();
 	t_login("azerty127");
-	t_distance(Math.sqrt(Math.pow(innerWidth * 0.5, 2) + Math.pow(innerHeigth * 0.5, 2)));
-	t_stop(false);
-
-
+	init_my_player();
 	render_loop();
+}
+
+function init_ws ()
+{
+	window.socket = io.connect("http://localhost:4000");
+
+	// ------------ emit ------------ //
+
+	window.t_login = function (pseudo)
+	{
+		socket.emit("login", pseudo);
+	}
+
+	window.t_distance = function (dist)
+	{
+		socket.emit("distance", dist);
+	}
+
+	window.t_stop = function (is_stop)
+	{
+		socket.emit("stop", is_stop);
+	}
+
+	window.t_inputs = function (direction, is_pulsing)
+	{
+		var data = {
+			direction: direction,
+			pulse: is_pulsing
+		};
+
+		socket.emit("inputs", data);
+	}
+
+	window.t_upgrade = function (upgrade_id, upgrade_choice_id)
+	{
+		var data = {
+			upgrade: upgrade_id,
+			choice: upgrade_choice_id
+		};
+
+		socket.emit("upgrade", data);
+	}
+
+	// ------------ on ------------ //
+
+	socket.on("err", function (err)
+	{
+		console.error("err:", err);
+	});
+
+	socket.on("upgrades", function (data)
+	{
+		console.log("upgrades:", data);
+
+		is_logged = true;
+
+		my_player.upgrades = data;
+	});
+
+	socket.on("update", function (data)
+	{
+		console.log("update:", data);
+	});
+}
+
+function init_my_player () {
+	
+	if (!is_logged) {
+		return setTimeout(init_my_player, 200); // wait
+	}
+
+	t_distance(Math.sqrt(hW * hW + hH * hH));
+	t_stop(false);
 }
 
 function render_loop ()
 {
+	requestAnimationFrame(render_loop);
 
-	resquestAnimationFrame(render_loop);
+	buffer_ctx.fillStyle = "#000";
+	buffer_ctx.fillRect(0, 0, W, H);
+
+	visible_ctx.drawImage(buffer_canvas, 0, 0);
 }
 
 </script>
