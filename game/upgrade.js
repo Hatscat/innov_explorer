@@ -38,8 +38,6 @@ function upgrade_handler (socket, players, data) {
 			socket.emit("err", error("login", err, "no way to save upgrades data"))
 			return
 		}
-
-		console.log(players)
 	})
 }
 

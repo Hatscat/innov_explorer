@@ -5,7 +5,7 @@ var upgrades_parser = require("../upgrades_parser.js")
 
 function login_handler (socket, players, pseudo) {
 	
-	pseudo += '' // to string
+	pseudo = pseudo.toString().trim()
 
 	if (pseudo.length < config.pseudo_min_length) {
 		socket.emit("err", error("login", pseudo, "pseudo too short"))

@@ -29,7 +29,7 @@ function add (hex, upgrade_id, upgrade_choice_id) { // Array<int>
 
 	var arr = decode(hex)
 
-	arr[upgrade_id] = upgrade_choice_id & 3
+	arr[Math.floor(upgrade_id)] = upgrade_choice_id & 3
 
 	return arr
 }
