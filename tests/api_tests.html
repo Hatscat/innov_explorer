@@ -32,28 +32,41 @@
 		socket.emit("inputs", data);
 	}
 
+	function t_upgrade (upgrade_id, upgrade_choice_id)
+	{
+		var data = {
+			upgrade: upgrade_id,
+			choice: upgrade_choice_id
+		};
+
+		socket.emit("upgrade", data));
+	}
+
 	// ------------ on ------------ //
 
 	socket.on("err", function (err)
 	{
-		console.error(err);
+		console.error("err:", err);
 	});
 
 	socket.on("upgrades", function (data)
 	{
-		console.log(data);
+		console.log("upgrades:", data);
 	});
 
 	// ------------ tests ------------ //
 	
 	function launch_tests ()
 	{
+		console.warn("it should produce 16 errors:");
+
 		// should produce errors
 		console.warn("3 pseudo not found errors...");
 
 		t_distance(1337);
 		t_stop(false);
 		t_inputs(Math.PI, true); 
+		t_upgrade(0, 1); 
 
 
 		// should produce errors
@@ -66,7 +79,7 @@
 		t_login("azerty"); // user already co error
 
 
-		// no error
+		// no error and OK
 
 		t_distance(1337);
 		t_distance(0);
@@ -74,6 +87,8 @@
 		t_stop(true);
 		t_inputs(-Math.PI, false);
 		t_inputs(Math.PI, true);
+		t_upgrade(0, 0); 
+		t_upgrade(9000, 3); 
 
 
 		// no error but examples to avoid!
@@ -82,15 +97,22 @@
 		t_stop(1);
 		t_inputs(false);
 		t_inputs(true, 1);
+		t_upgrade(); 
+		t_upgrade(3.14); 
 
 
 		// errors
-		console.warn("4 api errors...");
+		console.warn("9 api errors...");
 
 		t_distance("azerty");
 		t_inputs("bob", false);
 		t_inputs(-10, false);
 		t_inputs(10, false);
+		t_upgrade("test", 1); 
+		t_upgrade(-1, 1); 
+		t_upgrade(0, "hello"); 
+		t_upgrade(0, -1); 
+		t_upgrade(0, 4); 
 	}
 
 </script>

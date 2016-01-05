@@ -1,6 +1,7 @@
 var level = require("level")
 var config = require("../config.js")
 var error = require("../error_formater.js")
+var upgrades_parser = require("../upgrades_parser.js")
 
 var db = level(config.users_db_path)
 
@@ -30,11 +31,12 @@ function login_handler (socket, players, pseudo) {
 
 	db.get(pseudo, "level", function (err, data) {
 
-		var upgrades = data || config.default_upgrades_value
+		var upgrades_hex = data || config.default_upgrades_value
+		var upgrades = upgrades_parser.decode(upgrades_hex)
 
 		if (err) { // new pseudo
 
-			db.put(pseudo, upgrades, function (err) {
+			db.put(pseudo, upgrades_hex, function (err) {
 				if (err) {
 					console.error("level db 'put' error: ", err)
 					socket.emit("err", error("login", err, "no way to store this new pseudo"))
