@@ -17,19 +17,19 @@ var io = require("socket.io")(server.select("game").listener)
 
 io.on("connection", function (socket) {
 
-	console.log("connection!")
-	
 	socket.pseudo = null
 
 	socket.on("login", login_handler.bind(null, socket, players))
-	socket.on("set_dist", set_distance_handler.bind(null, socket, players))
+	socket.on("distance", set_distance_handler.bind(null, socket, players))
 	socket.on("stop", stop_handler.bind(null, socket, players))
 	socket.on("upgrade", upgrade_handler.bind(null, socket, players))
 	socket.on("inputs", inputs_handler.bind(null, socket, players))
 
 	socket.once("disconnect", function () {
-		console.log("player " + socket.pseudo + " left the game")
-		players[socket.pseudo] = null
+		if (socket.pseudo) {
+			console.log("player " + socket.pseudo + " left the game")
+			players[socket.pseudo] = null
+		}
 	})
 })
 

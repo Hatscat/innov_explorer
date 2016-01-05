@@ -6,8 +6,6 @@ var db = level(config.users_db_path)
 
 function login (socket, players, pseudo) {
 	
-	console.log("pseudo: ", pseudo)
-	
 	pseudo += '' // to string
 
 	if (pseudo.length < config.pseudo_min_length) {
@@ -24,7 +22,13 @@ function login (socket, players, pseudo) {
 
 	if (players[pseudo]) {
 		console.log("double connexion: ", pseudo)
-		socket.emit("err", error("login", pseudo, "already use"))
+		socket.emit("err", error("login", pseudo, "pseudo already used"))
+		return
+	}
+
+	if (socket.pseudo) {
+		console.log("user already logged: ", pseudo, ",", socket.pseudo)
+		socket.emit("err", error("login", pseudo, "user already logged"))
 		return
 	}
 
@@ -33,8 +37,6 @@ function login (socket, players, pseudo) {
 		var upgrades = data || config.default_upgrades_value
 
 		if (err) { // new pseudo
-
-			console.log("level db error: ", err)
 
 			db.put(pseudo, upgrades, function (err) {
 				if (err) {
@@ -51,7 +53,7 @@ function login (socket, players, pseudo) {
 			x: 0,
 			y: 0,
 			direction: 0,
-			stop: true,
+			stop: true, // default value ?
 			distance_max: config.distance_min,
 			pulse_timer: 0
 		}

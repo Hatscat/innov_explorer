@@ -1,13 +1,13 @@
 var error = require("../error_formater.js")
 
-function set_distance (socket, players, dist) {
+function stop (socket, players, is_stop) {
 
-	if (isNaN(dist)) {
-		socket.emit("error", error("set_dist", dist, "NaN"))
+	if (!players[socket.pseudo]) {
+		socket.emit("err", error("stop", socket.pseudo, "pseudo not found"))
 		return
 	}
 
-	players[socket.pseudo].distance_max = +dist
+	players[socket.pseudo].stop = is_stop == true
 }
 
-module.exports = set_distance
+module.exports = stop
