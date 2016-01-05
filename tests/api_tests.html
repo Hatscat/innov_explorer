@@ -1,120 +1,121 @@
 <body>
 <script src="http://localhost:4000/socket.io/socket.io.js"></script>
 <script>
-	"use strict"
 
-	window.socket = io.connect("http://localhost:4000");
+"use strict"
 
-	// ------------ emit ------------ //
+window.socket = io.connect("http://localhost:4000");
 
-	function t_login (pseudo)
-	{
-		socket.emit("login", pseudo);
-	}
+// ------------ emit ------------ //
 
-	function t_distance (dist)
-	{
-		socket.emit("distance", dist);
-	}
+function t_login (pseudo)
+{
+	socket.emit("login", pseudo);
+}
 
-	function t_stop (is_stop)
-	{
-		socket.emit("stop", is_stop);
-	}
+function t_distance (dist)
+{
+	socket.emit("distance", dist);
+}
 
-	function t_inputs (direction, is_pulsing)
-	{
-		var data = {
-			direction: direction,
-			pulse: is_pulsing
-		};
+function t_stop (is_stop)
+{
+	socket.emit("stop", is_stop);
+}
 
-		socket.emit("inputs", data);
-	}
+function t_inputs (direction, is_pulsing)
+{
+	var data = {
+		direction: direction,
+		pulse: is_pulsing
+	};
 
-	function t_upgrade (upgrade_id, upgrade_choice_id)
-	{
-		var data = {
-			upgrade: upgrade_id,
-			choice: upgrade_choice_id
-		};
+	socket.emit("inputs", data);
+}
 
-		socket.emit("upgrade", data);
-	}
+function t_upgrade (upgrade_id, upgrade_choice_id)
+{
+	var data = {
+		upgrade: upgrade_id,
+		choice: upgrade_choice_id
+	};
 
-	// ------------ on ------------ //
+	socket.emit("upgrade", data);
+}
 
-	socket.on("err", function (err)
-	{
-		console.error("err:", err);
-	});
+// ------------ on ------------ //
 
-	socket.on("upgrades", function (data)
-	{
-		console.log("upgrades:", data);
-	});
+socket.on("err", function (err)
+{
+	console.error("err:", err);
+});
 
-	// ------------ tests ------------ //
-	
-	function launch_tests ()
-	{
-		console.warn("it should produce 19 errors:");
+socket.on("upgrades", function (data)
+{
+	console.log("upgrades:", data);
+});
 
-		// should produce errors
-		console.warn("4 \"pseudo not found\" errors...");
+// ------------ tests ------------ //
 
-		t_distance(1337);
-		t_stop(false);
-		t_inputs(Math.PI, true); 
-		t_upgrade(0, 1); 
+function launch_tests ()
+{
+	console.warn("it should produce 19 errors:");
 
+	// should produce errors
+	console.warn("4 \"pseudo not found\" errors...");
 
-		// should produce errors
-		console.warn("4 login errors...");
-
-		t_login("az"); // too short error
-		t_login("azerty0123456789"); // too long error
-		t_login("bob408"); // no error
-		t_login("bob408"); // pseudo already used error
-		t_login("azerty"); // user already co error
+	t_distance(1337);
+	t_stop(false);
+	t_inputs(Math.PI, true); 
+	t_upgrade(0, 1); 
 
 
-		// no error and OK
+	// should produce errors
+	console.warn("4 login errors...");
 
-		t_distance(1337);
-		t_distance(0);
-		t_stop(false);
-		t_stop(true);
-		t_inputs(-Math.PI, false);
-		t_inputs(Math.PI, true);
-		t_upgrade(0, 0); 
-		t_upgrade(9, 3); 
+	t_login("az"); // too short error
+	t_login("azerty0123456789"); // too long error
+	t_login("bob408"); // no error
+	t_login("bob408"); // pseudo already used error
+	t_login("azerty"); // user already co error
 
 
-		// no error but examples to avoid!
+	// no error and OK
 
-		t_distance(null);
-		t_stop(1);
-		t_inputs(false);
-		t_inputs(true, 1);
-		t_upgrade(3.14, true); 
+	t_distance(1337);
+	t_distance(0);
+	t_stop(false);
+	t_stop(true);
+	t_inputs(-Math.PI, false);
+	t_inputs(Math.PI, true);
+	t_upgrade(0, 0); 
+	t_upgrade(9, 3); 
 
 
-		// errors
-		console.warn("11 api errors...");
+	// no error but examples to avoid!
 
-		t_distance("azerty");
-		t_inputs("bob", false);
-		t_inputs(-10, false);
-		t_inputs(10, false);
-		t_upgrade("test", 1); 
-		t_upgrade(-1, 1); 
-		t_upgrade(0, "hello"); 
-		t_upgrade(0, -1); 
-		t_upgrade(0, 4); 
-		t_upgrade(); 
-		t_upgrade(1); 
-	}
+	t_distance(null);
+	t_stop(1);
+	t_inputs(false);
+	t_inputs(true, 1);
+	t_upgrade(3.14, true); 
+
+
+	// errors
+	console.warn("11 api errors...");
+
+	t_distance("azerty");
+	t_inputs("bob", false);
+	t_inputs(-10, false);
+	t_inputs(10, false);
+	t_upgrade("test", 1); 
+	t_upgrade(-1, 1); 
+	t_upgrade(0, "hello"); 
+	t_upgrade(0, -1); 
+	t_upgrade(0, 4); 
+	t_upgrade(); 
+	t_upgrade(1); 
+}
 
 </script>
 </body>

@@ -1,0 +1,79 @@
+<body>
+<canvas id="visible_canvas"></canvas>
+<script src="http://localhost:4000/socket.io/socket.io.js"></script>
+<script>
+
+"use strict"
+
+window.socket = io.connect("http://localhost:4000");
+
+// ------------ emit ------------ //
+
+function t_login (pseudo)
+{
+	socket.emit("login", pseudo);
+}
+
+function t_distance (dist)
+{
+	socket.emit("distance", dist);
+}
+
+function t_stop (is_stop)
+{
+	socket.emit("stop", is_stop);
+}
+
+function t_inputs (direction, is_pulsing)
+{
+	var data = {
+		direction: direction,
+		pulse: is_pulsing
+	};
+
+	socket.emit("inputs", data);
+}
+
+function t_upgrade (upgrade_id, upgrade_choice_id)
+{
+	var data = {
+		upgrade: upgrade_id,
+		choice: upgrade_choice_id
+	};
+
+	socket.emit("upgrade", data);
+}
+
+// ------------ on ------------ //
+
+socket.on("err", function (err)
+{
+	console.error("err:", err);
+});
+
+socket.on("upgrades", function (data)
+{
+	console.log("upgrades:", data);
+});
+
+// ------------ tests ------------ //
+
+onload = function ()
+{
+
+	t_login("azerty127");
+	t_distance(Math.sqrt(Math.pow(innerWidth * 0.5, 2) + Math.pow(innerHeigth * 0.5, 2)));
+	t_stop(false);
+
+
+	render_loop();
+}
+
+function render_loop ()
+{
+
+	resquestAnimationFrame(render_loop);
+}
+
+</script>
+</body>
