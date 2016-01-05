@@ -1,13 +1,20 @@
 var error = require("../error_formater.js")
 
-function set_distance (socket, players, dist) {
+function upgrade_handler (socket, players, up_val) {
 
-	if (isNaN(dist)) {
-		socket.emit("error", error("set_dist", dist, "NaN"))
+	if (!players[socket.pseudo]) {
+		socket.emit("err", error("upgrade", socket.pseudo, "pseudo not found"))
 		return
 	}
 
-	players[socket.pseudo].distance_max = +dist
+	if (isNaN(up_val)) {
+		socket.emit("err", error("upgrade", up_val, "NaN"))
+		return
+	}
+
+	players[socket.pseudo].upgrades |= up_val
+
+	console.log(players)
 }
 
-module.exports = set_distance
+module.exports = upgrade_handler

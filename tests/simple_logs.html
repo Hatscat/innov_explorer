@@ -5,29 +5,93 @@
 
 	window.socket = io.connect("http://localhost:4000");
 
-	// ---------------------------------- //
+	// ------------ emit ------------ //
 
-	function t_login (pseudo) {
+	function t_login (pseudo)
+	{
 		socket.emit("login", pseudo);
 	}
 
-	function t_distance (dist) {
+	function t_distance (dist)
+	{
 		socket.emit("distance", dist);
 	}
 
-	function t_stop (is_stop) {
+	function t_stop (is_stop)
+	{
 		socket.emit("stop", is_stop);
 	}
 
-	// ---------------------------------- //
+	function t_inputs (direction, is_pulsing)
+	{
+		var data = {
+			direction: direction,
+			pulse: is_pulsing
+		};
 
-	socket.on("err", function (err) {
+		socket.emit("inputs", data);
+	}
+
+	// ------------ on ------------ //
+
+	socket.on("err", function (err)
+	{
 		console.error(err);
 	});
 
-	socket.on("upgrades", function (data) {
+	socket.on("upgrades", function (data)
+	{
 		console.log(data);
 	});
+
+	// ------------ tests ------------ //
+	
+	function launch_tests ()
+	{
+		// should produce errors
+		console.warn("3 pseudo not found errors...");
+
+		t_distance(1337);
+		t_stop(false);
+		t_inputs(Math.PI, true); 
+
+
+		// should produce errors
+		console.warn("4 login errors...");
+
+		t_login("az"); // too short error
+		t_login("azerty0123456789"); // too long error
+		t_login("bob408"); // no error
+		t_login("bob408"); // pseudo already used error
+		t_login("azerty"); // user already co error
+
+
+		// no error
+
+		t_distance(1337);
+		t_distance(0);
+		t_stop(false);
+		t_stop(true);
+		t_inputs(-Math.PI, false);
+		t_inputs(Math.PI, true);
+
+
+		// no error but examples to avoid!
+
+		t_distance(null);
+		t_stop(1);
+		t_inputs(false);
+		t_inputs(true, 1);
+
+
+		// errors
+		console.warn("4 api errors...");
+
+		t_distance("azerty");
+		t_inputs("bob", false);
+		t_inputs(-10, false);
+		t_inputs(10, false);
+	}
 
 </script>
 </body>

@@ -4,30 +4,26 @@ var error = require("../error_formater.js")
 
 var db = level(config.users_db_path)
 
-function login (socket, players, pseudo) {
+function login_handler (socket, players, pseudo) {
 	
 	pseudo += '' // to string
 
 	if (pseudo.length < config.pseudo_min_length) {
-		console.log("pseudo too short: ", pseudo)
 		socket.emit("err", error("login", pseudo, "pseudo too short"))
 		return
 	}
 
 	if (pseudo.length > config.pseudo_max_length) {
-		console.log("pseudo too long: ", pseudo)
 		socket.emit("err", error("login", pseudo, "pseudo too long"))
 		return
 	}
 
 	if (players[pseudo]) {
-		console.log("double connexion: ", pseudo)
 		socket.emit("err", error("login", pseudo, "pseudo already used"))
 		return
 	}
 
 	if (socket.pseudo) {
-		console.log("user already logged: ", pseudo, ",", socket.pseudo)
 		socket.emit("err", error("login", pseudo, "user already logged"))
 		return
 	}
@@ -53,9 +49,10 @@ function login (socket, players, pseudo) {
 			x: 0,
 			y: 0,
 			direction: 0,
-			stop: true, // default value ?
 			distance_max: config.distance_min,
-			pulse_timer: 0
+			pulse_timer: 0,
+			can_pulse: true,
+			stop: true // default value ?
 		}
 
 		socket.pseudo = pseudo
@@ -64,5 +61,5 @@ function login (socket, players, pseudo) {
 	})
 }
 
-module.exports = login
+module.exports = login_handler
 

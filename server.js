@@ -1,7 +1,7 @@
 var Hapi = require("hapi")
 var config = require("./config.js")
 var login_handler = require("./game/login.js")
-var set_distance_handler = require("./game/set_distance.js")
+var distance_handler = require("./game/distance.js")
 var stop_handler = require("./game/stop.js")
 var upgrade_handler = require("./game/upgrade.js")
 var inputs_handler = require("./game/inputs.js")
@@ -20,7 +20,7 @@ io.on("connection", function (socket) {
 	socket.pseudo = null
 
 	socket.on("login", login_handler.bind(null, socket, players))
-	socket.on("distance", set_distance_handler.bind(null, socket, players))
+	socket.on("distance", distance_handler.bind(null, socket, players))
 	socket.on("stop", stop_handler.bind(null, socket, players))
 	socket.on("upgrade", upgrade_handler.bind(null, socket, players))
 	socket.on("inputs", inputs_handler.bind(null, socket, players))

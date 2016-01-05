@@ -1,6 +1,6 @@
 var error = require("../error_formater.js")
 
-function set_distance (socket, players, dist) {
+function distance_handler (socket, players, dist) {
 
 	if (!players[socket.pseudo]) {
 		socket.emit("err", error("distance", socket.pseudo, "pseudo not found"))
@@ -13,8 +13,6 @@ function set_distance (socket, players, dist) {
 	}
 
 	players[socket.pseudo].distance_max = +dist
-
-	console.log(players)
 }
 
-module.exports = set_distance
+module.exports = distance_handler
