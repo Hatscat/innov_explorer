@@ -39,7 +39,7 @@
 			choice: upgrade_choice_id
 		};
 
-		socket.emit("upgrade", data));
+		socket.emit("upgrade", data);
 	}
 
 	// ------------ on ------------ //
@@ -58,10 +58,10 @@
 	
 	function launch_tests ()
 	{
-		console.warn("it should produce 16 errors:");
+		console.warn("it should produce 19 errors:");
 
 		// should produce errors
-		console.warn("3 pseudo not found errors...");
+		console.warn("4 \"pseudo not found\" errors...");
 
 		t_distance(1337);
 		t_stop(false);
@@ -88,7 +88,7 @@
 		t_inputs(-Math.PI, false);
 		t_inputs(Math.PI, true);
 		t_upgrade(0, 0); 
-		t_upgrade(9000, 3); 
+		t_upgrade(9, 3); 
 
 
 		// no error but examples to avoid!
@@ -97,12 +97,11 @@
 		t_stop(1);
 		t_inputs(false);
 		t_inputs(true, 1);
-		t_upgrade(); 
-		t_upgrade(3.14); 
+		t_upgrade(3.14, true); 
 
 
 		// errors
-		console.warn("9 api errors...");
+		console.warn("11 api errors...");
 
 		t_distance("azerty");
 		t_inputs("bob", false);
@@ -113,6 +112,8 @@
 		t_upgrade(0, "hello"); 
 		t_upgrade(0, -1); 
 		t_upgrade(0, 4); 
+		t_upgrade(); 
+		t_upgrade(1); 
 	}
 
 </script>

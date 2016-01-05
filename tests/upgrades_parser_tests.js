@@ -11,6 +11,9 @@ console.log(">>>", upgrades_parser.encode([]) == "0")
 console.log('upgrades_parser.encode([0]) == "0"')
 console.log(">>>", upgrades_parser.encode([0]) == "0")
 
+console.log('upgrades_parser.encode([0,0]) == "0"')
+console.log(upgrades_parser.encode([0,0]) == "0")
+
 console.log('upgrades_parser.encode([1,1,2,2]) == "a5"')
 console.log(">>>", upgrades_parser.encode([1,1,2,2]) == "a5")
 
