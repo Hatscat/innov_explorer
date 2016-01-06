@@ -5,6 +5,7 @@
 "use strict"
 
 window.socket = io.connect("http://localhost:4000");
+window.logged = false;
 
 // ------------ emit ------------ //
 
@@ -52,6 +53,7 @@ socket.on("err", function (err)
 
 socket.on("upgrades", function (data)
 {
+	logged = true;
 	console.log("upgrades:", data);
 });
 
@@ -59,63 +61,98 @@ socket.on("upgrades", function (data)
 
 function launch_tests ()
 {
+	var delay = 800; // ms
+
 	console.warn("it should produce 19 errors:");
+	 
+	function t_1 ()
+	{
+		// should produce errors
+		console.warn("4 \"pseudo not found\" errors...");
 
-	// should produce errors
-	console.warn("4 \"pseudo not found\" errors...");
+		t_distance(1337);
+		t_stop(false);
+		t_inputs(Math.PI, true); 
+		t_upgrade(0, 1); 
 
-	t_distance(1337);
-	t_stop(false);
-	t_inputs(Math.PI, true); 
-	t_upgrade(0, 1); 
+		setTimeout(arguments[0][0].bind(this, arguments[0].slice(1)), delay);
+	}
 
+	function t_2 ()
+	{
+		// should produce errors
+		console.warn("2 login errors...");
 
-	// should produce errors
-	console.warn("4 login errors...");
+		t_login("az"); // too short error
+		t_login("azerty0123456789"); // too long error
+		t_login("bob408"); // no error
 
-	t_login("az"); // too short error
-	t_login("azerty0123456789"); // too long error
-	t_login("bob408"); // no error
-	t_login("bob408"); // pseudo already used error
-	t_login("azerty"); // user already co error
+		setTimeout(arguments[0][0].bind(this, arguments[0].slice(1)), delay);
+	}
 
+	function t_3 ()
+	{
+		// should produce errors
+		console.warn("2 login errors again...");
 
-	// no error and OK
+		t_login("bob408"); // pseudo already used error
+		t_login("azerty"); // user already co error
 
-	t_distance(1337);
-	t_distance(0);
-	t_stop(false);
-	t_stop(true);
-	t_inputs(-Math.PI, false);
-	t_inputs(Math.PI, true);
-	t_upgrade(0, 0); 
-	t_upgrade(9, 3); 
+		setTimeout(arguments[0][0].bind(this, arguments[0].slice(1)), delay);
+	}
 
+	function t_4 ()
+	{
+		// no error and OK
+		console.warn("no error here. 2 upgrades.");
 
-	// no error but examples to avoid!
+		t_distance(1337);
+		t_distance(0);
+		t_stop(false);
+		t_stop(true);
+		t_inputs(-Math.PI, false);
+		t_inputs(Math.PI, true);
+		t_upgrade(0, 0); 
+		t_upgrade(9, 3); 
 
-	t_distance(null);
-	t_stop(1);
-	t_inputs(false);
-	t_inputs(true, 1);
-	t_upgrade(3.14, true); 
+		setTimeout(arguments[0][0].bind(this, arguments[0].slice(1)), delay);
+	}
 
+	function t_5 ()
+	{
+		// no error but examples to avoid!
+		console.warn("no error again. 1 upgrades.");
 
-	// errors
-	console.warn("11 api errors...");
+		t_distance(null);
+		t_stop(1);
+		t_inputs(false);
+		t_inputs(true, 1);
+		t_upgrade(3.14, true); 
 
-	t_distance("azerty");
-	t_inputs("bob", false);
-	t_inputs(-10, false);
-	t_inputs(10, false);
-	t_upgrade("test", 1); 
-	t_upgrade(-1, 1); 
-	t_upgrade(0, "hello"); 
-	t_upgrade(0, -1); 
-	t_upgrade(0, 4); 
-	t_upgrade(); 
-	t_upgrade(1); 
+		setTimeout(arguments[0][0].bind(this, arguments[0].slice(1)), delay);
+	}
+
+	function t_6 ()
+	{
+		// errors
+		console.warn("11 api errors...");
+
+		t_distance("azerty");
+		t_inputs("bob", false);
+		t_inputs(-10, false);
+		t_inputs(10, false);
+		t_upgrade("test", 1); 
+		t_upgrade(-1, 1); 
+		t_upgrade(0, "hello"); 
+		t_upgrade(0, -1); 
+		t_upgrade(0, 4); 
+		t_upgrade(); 
+		t_upgrade(1);
+	}
+
+	t_1([ t_2, t_3, t_4, t_5, t_6 ]);
 }
+
 
 </script>
 </body>

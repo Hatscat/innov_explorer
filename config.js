@@ -7,6 +7,8 @@ module.exports = {
 	pulse_duration: 1000, // ms
 	default_upgrades_value: "0",
 	distance_min: 100,
+	default_speed: 10,
+	pulse_speed: 30,
 	
 }
 
