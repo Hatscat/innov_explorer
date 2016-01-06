@@ -5,7 +5,7 @@ var distance_handler = require("./game/distance.js")
 var stop_handler = require("./game/stop.js")
 var upgrade_handler = require("./game/upgrade.js")
 var inputs_handler = require("./game/inputs.js")
-var update_handler = require("./game/update.js")
+var update = require("./game/update.js")
 
 var server = new Hapi.Server()
 var players = {}
@@ -20,7 +20,7 @@ io.on("connection", function (socket) {
 	socket.pseudo = null
 
 	socket.on("login", login_handler.bind(null, socket, players))
-	socket.on("distance", distance_handler.bind(null, socket, players))
+	socket.on("distance2", distance_handler.bind(null, socket, players))
 	socket.on("stop", stop_handler.bind(null, socket, players))
 	socket.on("upgrade", upgrade_handler.bind(null, socket, players))
 	socket.on("inputs", inputs_handler.bind(null, socket, players))
@@ -35,7 +35,7 @@ io.on("connection", function (socket) {
 })
 
 // launch update loop
-
+update(players);
 
 server.start(function () {
 	console.log("innov explorer game server runs!")

@@ -8,17 +8,22 @@
 onload = function ()
 {
 	window.is_logged = false;
+	window.socket = io.connect("http://localhost:4000");
 	window.W = visible_canvas.width = innerWidth;
 	window.H = visible_canvas.height = innerHeight;
 	window.hW = W >> 1;
 	window.hH = H >> 1;
+	window.global_scale = 300;
 	window.visible_ctx = visible_canvas.getContext("2d");
 	window.buffer_canvas = visible_canvas.cloneNode();
 	window.buffer_ctx = buffer_canvas.getContext("2d");
+	window.other_players = [];
 	window.my_player = {
-		x: 0,
-		y: 0,
+		x: hW,
+		y: hH,
 		dir: 0,
+		is_stop: false,
+		side_len: 32,
 		upgrades: null
 	}
 	window.mouse = {
@@ -27,55 +32,16 @@ onload = function ()
 		is_down: false
 	}
 
-	init_ws();
-	t_login("azerty127");
-	init_my_player();
+	init_events();
+	socket.emit("login", "azerty127");
+	wait_logged_in();
 
 	render_loop();
 }
 
-function init_ws ()
+function init_events ()
 {
-	window.socket = io.connect("http://localhost:4000");
-
-	// ------------ emit ------------ //
-
-	window.t_login = function (pseudo)
-	{
-		socket.emit("login", pseudo);
-	}
-
-	window.t_distance = function (dist)
-	{
-		socket.emit("distance", dist);
-	}
-
-	window.t_stop = function (is_stop)
-	{
-		socket.emit("stop", is_stop);
-	}
-
-	window.t_inputs = function (direction, is_pulsing)
-	{
-		var data = {
-			direction: direction,
-			pulse: is_pulsing
-		};
-
-		socket.emit("inputs", data);
-	}
-
-	window.t_upgrade = function (upgrade_id, upgrade_choice_id)
-	{
-		var data = {
-			upgrade: upgrade_id,
-			choice: upgrade_choice_id
-		};
-
-		socket.emit("upgrade", data);
-	}
-
-	// ------------ on ------------ //
+	// ------------ socket on ------------ //
 
 	socket.on("err", function (err)
 	{
@@ -93,19 +59,45 @@ function init_ws ()
 
 	socket.on("update", function (data)
 	{
-		console.log("update:", data);
+		//console.log("update:", data);
+		
+		my_player.x = data.x * global_scale;
+		my_player.y = data.y * global_scale;
+		my_player.dir = data.dir;
+
+		other_players = data.players;
 	});
+
+	// ------------ mouse ------------ //
+
+	onmousemove = function (e)
+	{
+		mouse.x = e.clientX;
+		mouse.y = e.clientY;
+	}
+
+	onmousedown = function (e)
+	{
+		mouse.is_down = true;
+	}
+
+	onmouseup = function (e)
+	{
+		mouse.is_down = false;
+	}
+
+	// ------------ keyboard ------------ //
 }
 
-function init_my_player ()
+function wait_logged_in ()
 {
 	if (!is_logged)
 	{
-		return setTimeout(init_my_player, 200); // wait
+		return setTimeout(wait_logged_in, 200); // wait
 	}
 
-	t_distance(Math.sqrt(hW * hW + hH * hH));
-	t_stop(false);
+	socket.emit("distance2", hW * hW + hH * hH);
+	socket.emit("stop", false);
 }
 
 function render_loop ()
@@ -114,34 +106,42 @@ function render_loop ()
 
 	// ---- update ---- //
 
-	my_player.dir = Math.atan2(mouse.y - my_player.y, mouse.x - my_player.x);
+	if (Math.pow(mouse.x - my_player.x, 2) + Math.pow(mouse.y - my_player.y, 2) < my_player.side_len * my_player.side_len)
+	{
+		if (!my_player.is_stop)
+		{
+			my_player.is_stop = true;
+			socket.emit("stop", true);
+		}
+	}
+	else if (my_player.is_stop)
+	{
+		my_player.is_stop = false;
+		socket.emit("stop", false);
+	}
 
-	t_inputs(my_player.dir, mouse.is_down);
+	socket.emit("inputs",
+	{
+		//dir: Math.atan2(mouse.y - hH, mouse.x - hW), // in the true game
+		dir: Math.atan2(mouse.y - my_player.y, mouse.x - my_player.x),
+		pulse: mouse.is_down
+	});
 
 	// ---- render ---- //
 
 	buffer_ctx.fillStyle = "#000";
 	buffer_ctx.fillRect(0, 0, W, H);
 
-	//buffer_ctx.fillStyle = p.color; // in a loop
+	for (var i = other_players.length; i--;)
+	{
+
+		//buffer_ctx.fillStyle = p.color; // in a loop
+	}
+	
+	buffer_ctx.fillStyle = mouse.is_down ? "#0f0" : "#fff";
+	buffer_ctx.fillRect(my_player.x - my_player.side_len * 0.5, my_player.y - my_player.side_len * 0.5, my_player.side_len, my_player.side_len);
 
 	visible_ctx.drawImage(buffer_canvas, 0, 0);
-}
-
-onmousemove = function (e)
-{
-	mouse.x = e.clientX;
-	mouse.y = e.clientY;
-}
-
-onmousedown = function (e)
-{
-	mouse.is_down = true;
-}
-
-onmouseup = function (e)
-{
-	mouse.is_down = false;
 }
 
 </script>

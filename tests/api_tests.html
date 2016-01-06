@@ -16,7 +16,7 @@ function t_login (pseudo)
 
 function t_distance (dist)
 {
-	socket.emit("distance", dist);
+	socket.emit("distance2", dist);
 }
 
 function t_stop (is_stop)
@@ -27,7 +27,7 @@ function t_stop (is_stop)
 function t_inputs (direction, is_pulsing)
 {
 	var data = {
-		direction: direction,
+		dir: direction,
 		pulse: is_pulsing
 	};
 

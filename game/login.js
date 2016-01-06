@@ -27,7 +27,7 @@ function login_handler (socket, players, pseudo) {
 		return
 	}
 
-	players[pseudo] = { active: false } // reserved, warning in run loop
+	players[pseudo] = {} // reserved
 
 	users_db.get(pseudo, function (err, data) {
 
@@ -48,13 +48,16 @@ function login_handler (socket, players, pseudo) {
 		if (players[pseudo]) { // if not deco while db search
 
 			players[pseudo] = {
-				active: true,
+				socket: socket,
 				upgrades: upgrades,
-				x: 0,
-				y: 0,
-				direction: 0,
+				coord: {
+					x: 0,
+					y: 0,
+					dir: 0
+				},
 				speed: config.default_speed,
-				distance_max: config.distance_min,
+				collider_radius: config.default_collider_radius,
+				distance2_max: config.distance2_min,
 				pulse_timer: 0,
 				can_pulse: true,
 				stop: true // default value ?
