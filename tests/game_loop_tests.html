@@ -5,8 +5,6 @@
 
 "use strict"
 
-
-
 onload = function ()
 {
 	window.is_logged = false;
@@ -23,10 +21,16 @@ onload = function ()
 		dir: 0,
 		upgrades: null
 	}
+	window.mouse = {
+		x: 0,
+		y: 0,
+		is_down: false
+	}
 
 	init_ws();
 	t_login("azerty127");
 	init_my_player();
+
 	render_loop();
 }
 
@@ -93,9 +97,10 @@ function init_ws ()
 	});
 }
 
-function init_my_player () {
-	
-	if (!is_logged) {
+function init_my_player ()
+{
+	if (!is_logged)
+	{
 		return setTimeout(init_my_player, 200); // wait
 	}
 
@@ -107,10 +112,36 @@ function render_loop ()
 {
 	requestAnimationFrame(render_loop);
 
+	// ---- update ---- //
+
+	my_player.dir = Math.atan2(mouse.y - my_player.y, mouse.x - my_player.x);
+
+	t_inputs(my_player.dir, mouse.is_down);
+
+	// ---- render ---- //
+
 	buffer_ctx.fillStyle = "#000";
 	buffer_ctx.fillRect(0, 0, W, H);
 
+	//buffer_ctx.fillStyle = p.color; // in a loop
+
 	visible_ctx.drawImage(buffer_canvas, 0, 0);
+}
+
+onmousemove = function (e)
+{
+	mouse.x = e.clientX;
+	mouse.y = e.clientY;
+}
+
+onmousedown = function (e)
+{
+	mouse.is_down = true;
+}
+
+onmouseup = function (e)
+{
+	mouse.is_down = false;
 }
 
 </script>
